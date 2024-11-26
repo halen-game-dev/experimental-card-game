@@ -1,0 +1,22 @@
+///<summary>
+/// Author: Halen
+///
+///
+///
+///</summary>
+
+using Unity.Burst;
+using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
+
+namespace CardGame
+{
+    #ROOTNAMESPACEBEGIN#
+    [BurstCompile]
+    public struct #SCRIPTNAME# : IComponentData
+    {
+    
+    }
+    #ROOTNAMESPACEEND#
+}

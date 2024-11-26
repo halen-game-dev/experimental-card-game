@@ -1,0 +1,19 @@
+///<summary>
+/// Author: Halen
+/// 
+/// 
+/// 
+///</summary>
+
+using UnityEngine;
+
+namespace CardGame
+{
+    #ROOTNAMESPACEBEGIN#
+    public class #SCRIPTNAME#
+    {
+        #NOTRIM#
+    }
+    
+    #ROOTNAMESPACEEND#
+}

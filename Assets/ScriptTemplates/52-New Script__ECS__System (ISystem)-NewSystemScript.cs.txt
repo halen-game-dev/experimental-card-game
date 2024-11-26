@@ -1,0 +1,41 @@
+///<summary>
+/// Author: Halen
+///
+///
+///
+///</summary>
+
+using Unity.Burst;
+using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
+
+namespace CardGame
+{
+    #ROOTNAMESPACEBEGIN#
+    [BurstCompile]
+    public partial struct #SCRIPTNAME# : ISystem
+    {
+        // Called when this system is created.
+        [BurstCompile]
+        public void OnCreate(ref SystemState state)
+        {
+            #NOTRIM#
+        }
+
+        // Implement OnUpdate to perform the major work of this system.
+        [BurstCompile]
+        public void OnUpdate(ref SystemState state)
+        {
+            #NOTRIM#
+        }
+
+        // Called when this system is destroyed.
+        [BurstCompile]
+        public void OnDestroy(ref SystemState state)
+        {
+            #NOTRIM#
+        }
+    }
+    #ROOTNAMESPACEEND#
+}

@@ -1,0 +1,19 @@
+///<summary>
+/// Author: Halen
+///
+///
+///
+///</summary>
+
+using UnityEngine;
+
+namespace CardGame
+{
+    #ROOTNAMESPACEBEGIN#
+    [CreateAssetMenu(menuName = "ScriptableObject/#SCRIPTNAME#", fileName = "#SCRIPTNAME#", order = 0)]
+    public class #SCRIPTNAME# : ScriptableObject
+    {
+        #NOTRIM#
+    }
+    #ROOTNAMESPACEEND#
+}
