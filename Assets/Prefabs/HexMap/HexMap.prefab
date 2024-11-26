@@ -77,7 +77,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: 78ecddb1c9be9a042b17f4ee7c72f359, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -231,4 +231,5 @@ MonoBehaviour:
   m_cellPrefab: {fileID: 5977853281021051994, guid: a3624c4a9e8a70747bec8677a8d16d03, type: 3}
   m_width: 6
   m_height: 6
+  m_defaultColour: {r: 1, g: 1, b: 1, a: 1}
   m_cellLabelPrefab: {fileID: 4320208390638909814, guid: 0f2acc4a123bd0143b9d14a682de4d43, type: 3}

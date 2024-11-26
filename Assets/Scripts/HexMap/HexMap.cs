@@ -6,9 +6,7 @@
 ///</summary>
 
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
-using UnityEngine.InputSystem;
 
 namespace CardGame.HexMap
 {
@@ -23,7 +21,6 @@ namespace CardGame.HexMap
         [Space]
 
         [SerializeField] private Color m_defaultColour = Color.white;
-        [SerializeField] private Color m_touchedColour = Color.magenta;
 
         [Header("Labels")]
         [SerializeField] private TextMeshProUGUI m_cellLabelPrefab;
@@ -49,27 +46,21 @@ namespace CardGame.HexMap
         }
 
         private void Start()
+        {           
+            m_hexMesh.Triangulate(m_cells);
+        }
+
+        public void Refresh()
         {
             m_hexMesh.Triangulate(m_cells);
         }
 
-        public void CastForHexCell(InputAction.CallbackContext context)
-        {
-            Ray inputRay = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (Physics.Raycast(inputRay, out RaycastHit hit))
-            {
-                TouchCell(hit.point);
-            }
-        }
-
-        private void TouchCell(Vector3 position)
+        public HexCell GetCell(Vector3 position)
         {
             position = transform.InverseTransformPoint(position);
             HexCoordinates coordinates = HexCoordinates.FromPosition(position);
             int index = coordinates.X + coordinates.Z * m_width + coordinates.Z / 2;
-            HexCell cell = m_cells[index];
-            cell.colour = m_touchedColour;
-            m_hexMesh.Triangulate(m_cells);
+            return m_cells[index];
         }
 
         /// <summary>
@@ -88,10 +79,35 @@ namespace CardGame.HexMap
             cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
             cell.colour = m_defaultColour;
 
+            if (x > 0)
+            {
+                cell.SetNeighbour(HexDirection.W, m_cells[i - 1]);
+            }
+            if (z > 0)
+            {
+                if ((z & 1) == 0)
+                {
+                    cell.SetNeighbour(HexDirection.SE, m_cells[i - m_width]);
+                    if (x > 0)
+                    {
+                        cell.SetNeighbour(HexDirection.SW, m_cells[i - m_width - 1]);
+                    }
+                }
+                else
+                {
+                    cell.SetNeighbour(HexDirection.SW, m_cells[i - m_width]);
+                    if (x < m_width - 1)
+                    {
+                        cell.SetNeighbour(HexDirection.SE, m_cells[i - m_width + 1]);
+                    }
+                }
+            }
+
             var label = Instantiate(m_cellLabelPrefab);
             label.rectTransform.SetParent(m_mapCanvas.transform, false);
             label.rectTransform.anchoredPosition = new(positon.x / 10f, positon.z / 10f);
             label.text = cell.coordinates.ToString();
+            cell.labelRect = label.rectTransform;
         }
     }
 }

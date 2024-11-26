@@ -32,10 +32,10 @@ namespace CardGame.HexMap
 
         public static HexCoordinates FromPosition(Vector3 position)
         {
-            float x = position.x / HexMetrics.innerRadius * 2f;
+            float x = position.x / (HexMetrics.innerRadius * 2f);
             float y = -x;
 
-            float offset = position.z / HexMetrics.outerRadius * 3f;
+            float offset = position.z / (HexMetrics.outerRadius * 3f);
             x -= offset;
             y -= offset;
 
@@ -45,7 +45,7 @@ namespace CardGame.HexMap
 
             // the sum of the coordinates should always be 0
             // otherwise the coordinates are inaccurate
-            if (iX + iY + iY != 0)
+            if (iX + iY + iZ != 0)
             {
                 // get the rounding delta
                 float dX = Mathf.Abs(x - iX);
