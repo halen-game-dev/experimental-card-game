@@ -1,5 +1,5 @@
 {
-    "name": "InputSystem_Actions",
+    "name": "CardGameInputActions",
     "maps": [
         {
             "name": "Player",
@@ -986,6 +986,34 @@
                     "processors": "",
                     "groups": "XR",
                     "action": "TrackedDeviceOrientation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "HexMap",
+            "id": "bae56e0b-e5c6-4e10-98ad-896eb4e26a53",
+            "actions": [
+                {
+                    "name": "Click",
+                    "type": "Button",
+                    "id": "c6b908c4-548d-448b-a847-4da6ff3bc617",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "02ba5255-65f2-492a-b2af-e973c72b6e8a",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "Click",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
