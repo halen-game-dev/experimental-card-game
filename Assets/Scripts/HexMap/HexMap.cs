@@ -19,6 +19,9 @@ namespace CardGame.HexMap
         [SerializeField] private int m_chunkCountX = 4;
         [SerializeField] private int m_chunkCountZ = 3;
 
+        public int chunkCountX => m_chunkCountX;
+        public int chunkCountZ => m_chunkCountZ;
+
         private int m_cellCountX, m_cellCountZ;
 
         [Space]
@@ -93,7 +96,7 @@ namespace CardGame.HexMap
             HexCell cell = m_cells[i] = Instantiate(m_cellPrefab);
             cell.transform.localPosition = positon;
             cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
-            cell.colour = m_defaultColour;
+            cell.Colour = m_defaultColour;
 
             if (x > 0)
             {

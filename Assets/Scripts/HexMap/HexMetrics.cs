@@ -15,7 +15,7 @@ namespace CardGame.HexMap
         public const float outerRadius = 10f;
         public const float innerRadius = outerRadius * 0.866025404f;
 
-        // hex cell colour blending
+        // hex cell Colour blending
         public const float solidFactor = 0.8f;
         public const float blendFactor = 1f - solidFactor;
 

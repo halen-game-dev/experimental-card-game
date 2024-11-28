@@ -25,16 +25,23 @@ namespace CardGame.HexMap
             m_cells = new HexCell[HexMetrics.chunkSizeX * HexMetrics.chunkSizeZ];
         }
 
-        private void Start()
+        private void LateUpdate()
         {
             m_mesh.Triangulate(m_cells);
+            enabled = false;
         }
 
         public void AddCell(int index, HexCell cell)
         {
             m_cells[index] = cell;
+            cell.chunk = this;
             cell.transform.SetParent(transform, false);
             cell.labelRect.SetParent(m_mapCanvas.transform, false);
+        }
+
+        public void Refresh()
+        {
+            enabled = true;
         }
     }
 }

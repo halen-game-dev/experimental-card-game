@@ -19,6 +19,9 @@ namespace CardGame.HexMap
         private Color m_activeColour;
         private int m_activeElevation;
 
+        private bool m_applyColour;
+        private bool m_applyElevation = true;
+
         private void Awake()
         {
             SelectColour(0);
@@ -43,18 +46,28 @@ namespace CardGame.HexMap
 
         private void EditCell(HexCell cell)
         {
-            cell.colour = m_activeColour;
-            cell.Elevation = m_activeElevation;
+            if (m_applyColour)
+                cell.Colour = m_activeColour;
+
+            if (m_applyElevation)
+                cell.Elevation = m_activeElevation;
         }
 
         public void SelectColour(int index)
         {
-            m_activeColour = m_colours[index];
+            m_applyColour = index >= 0;
+            if (m_applyColour)
+                m_activeColour = m_colours[index];
         }
 
         public void SelectElevation(float elevation)
         {
             m_activeElevation = (int)elevation;
+        }
+
+        public void SetApplyElevation(bool value)
+        {
+            m_applyElevation = value;
         }
     }
 }

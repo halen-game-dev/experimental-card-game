@@ -12,18 +12,34 @@ namespace CardGame.HexMap
     public class HexCell : MonoBehaviour
     {
         public HexCoordinates coordinates;
-        public Color colour;
-        private int m_elevation;
+        private Color m_colour;
+        private int m_elevation = int.MinValue;
 
+        public HexMapChunk chunk;
         public RectTransform labelRect;
 
         public Vector3 Position => transform.localPosition;
+        public Color Colour
+        {
+            get { return m_colour; }
+            set
+            {
+                if (m_colour == value)
+                    return;
+
+                m_colour = value;
+                Refresh();
+            }
+        }
 
         public int Elevation
         {
             get { return m_elevation; }
             set
             {
+                if (m_elevation == value)
+                    return;
+                
                 m_elevation = value;
                 Vector3 position = transform.localPosition;
                 position.y = value * HexMetrics.elevationStep;
@@ -33,6 +49,8 @@ namespace CardGame.HexMap
                 Vector3 labelPosition = labelRect.localPosition;
                 labelPosition.z = -position.y;
                 labelRect.localPosition = labelPosition;
+
+                Refresh();
             }
         }
 
@@ -62,6 +80,22 @@ namespace CardGame.HexMap
         public HexEdgeType GetEdgeType(HexCell otherCell)
         {
             return HexMetrics.GetEdgeType(m_elevation, otherCell.m_elevation);
+        }
+
+        private void Refresh()
+        {
+            if (chunk)
+            {
+                chunk.Refresh();
+                for (int n = 0; n < m_neighbours.Length; n++)
+                {
+                    HexCell neighbour = m_neighbours[n];
+                    if (neighbour != null && neighbour.chunk != chunk)
+                    {
+                        neighbour.chunk.Refresh();
+                    }
+                }
+            }
         }
     }
 }
