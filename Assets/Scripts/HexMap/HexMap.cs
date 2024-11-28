@@ -22,15 +22,25 @@ namespace CardGame.HexMap
 
         [SerializeField] private Color m_defaultColour = Color.white;
 
-        [Header("Labels")]
+        [Header("Cell Labels")]
         [SerializeField] private TextMeshProUGUI m_cellLabelPrefab;
+
+        [Header("Irregularity")]
+        public Texture2D noiseSource;
 
         private HexCell[] m_cells;
         private Canvas m_mapCanvas;
         private HexMesh m_hexMesh;
 
+        private void OnEnable()
+        {
+            HexMetrics.noiseSource = noiseSource;
+        }
+
         private void Awake()
         {
+            HexMetrics.noiseSource = noiseSource;
+            
             m_mapCanvas = GetComponentInChildren<Canvas>();
             m_hexMesh = GetComponentInChildren<HexMesh>();
             
@@ -105,9 +115,11 @@ namespace CardGame.HexMap
 
             var label = Instantiate(m_cellLabelPrefab);
             label.rectTransform.SetParent(m_mapCanvas.transform, false);
-            label.rectTransform.anchoredPosition = new(positon.x / 10f, positon.z / 10f);
+            label.rectTransform.anchoredPosition = new(positon.x, positon.z);
             label.text = cell.coordinates.ToString();
             cell.labelRect = label.rectTransform;
+
+            cell.Elevation = 0;
         }
     }
 }

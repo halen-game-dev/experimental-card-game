@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 1897624983059166288}
   - component: {fileID: 959159004841242377}
   m_Layer: 5
-  m_Name: Hex Map Index Canvas
+  m_Name: Hex Cell Labels Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -126,7 +126,7 @@ RectTransform:
   m_GameObject: {fileID: 3156647645234373334}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 4944914980802458443}
@@ -233,3 +233,4 @@ MonoBehaviour:
   m_height: 6
   m_defaultColour: {r: 1, g: 1, b: 1, a: 1}
   m_cellLabelPrefab: {fileID: 4320208390638909814, guid: 0f2acc4a123bd0143b9d14a682de4d43, type: 3}
+  noiseSource: {fileID: 2800000, guid: 1d57de4e82ec25f4b8602021f65b560b, type: 3}

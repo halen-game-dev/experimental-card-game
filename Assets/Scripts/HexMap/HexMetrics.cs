@@ -16,15 +16,21 @@ namespace CardGame.HexMap
         public const float innerRadius = outerRadius * 0.866025404f;
 
         // hex cell colour blending
-        public const float solidFactor = 0.75f;
+        public const float solidFactor = 0.8f;
         public const float blendFactor = 1f - solidFactor;
 
         // hex cell elevation
-        public const float elevationStep = 5f;
+        public const float elevationStep = 3f;
         public const int terracesPerSlope = 2;
         public const int terraceSteps = terracesPerSlope * 2 + 1;
         public const float horizontalTerraceStepSize = 1f / terraceSteps;
         public const float verticalTerraceStepSize = 1f / (terracesPerSlope + 1);
+
+        // mesh perturbing
+        public static Texture2D noiseSource;
+        public const float noiseScale = 0.003f;
+        public const float cellPerturbStrength = 4f;
+        public const float elevationPerturbStrength = 1.5f;
 
         // hex cell corner positions
         private static Vector3[] corners = {
@@ -37,6 +43,22 @@ namespace CardGame.HexMap
         new(0f, 0f, outerRadius)
         };
 
+        public static HexEdgeType GetEdgeType(int elevation1, int elevation2)
+        {
+            // check if flat
+            if (elevation1 == elevation2)
+                return HexEdgeType.Flat;
+
+            // check if slope
+            int delta = elevation2 - elevation1;
+            if (Mathf.Abs(delta) == 1)
+                return HexEdgeType.Slope;
+
+            // otherwise, cliff
+            return HexEdgeType.Cliff;
+        }
+
+        #region MeshTriangultionMethods
         public static Vector3 GetFirstCorner(HexDirection direction)
         {
             return corners[(int)direction];
@@ -79,20 +101,14 @@ namespace CardGame.HexMap
             float h = step * horizontalTerraceStepSize;
             return Color.Lerp(a, b, h);
         }
+        #endregion
 
-        public static HexEdgeType GetEdgeType(int elevation1, int elevation2)
+        public static Vector4 SampleNoise(Vector3 position)
         {
-            // check if flat
-            if (elevation1 == elevation2)
-                return HexEdgeType.Flat;
-
-            // check if slope
-            int delta = elevation2 - elevation1;
-            if (Mathf.Abs(delta) == 1)
-                return HexEdgeType.Slope;
-
-            // otherwise, cliff
-            return HexEdgeType.Cliff;
+            return noiseSource.GetPixelBilinear(
+                position.x * noiseScale,
+                position.z * noiseScale
+            );
         }
     }
     

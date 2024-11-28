@@ -17,6 +17,8 @@ namespace CardGame.HexMap
 
         public RectTransform labelRect;
 
+        public Vector3 Position => transform.localPosition;
+
         public int Elevation
         {
             get { return m_elevation; }
@@ -25,10 +27,11 @@ namespace CardGame.HexMap
                 m_elevation = value;
                 Vector3 position = transform.localPosition;
                 position.y = value * HexMetrics.elevationStep;
+                position.y += (HexMetrics.SampleNoise(position).y * 2f - 1f) * HexMetrics.elevationPerturbStrength;
                 transform.localPosition = position;
 
                 Vector3 labelPosition = labelRect.localPosition;
-                labelPosition.z = m_elevation * -HexMetrics.elevationStep / 10f;
+                labelPosition.z = -position.y;
                 labelRect.localPosition = labelPosition;
             }
         }
