@@ -32,6 +32,9 @@ namespace CardGame.HexMap
         public const float cellPerturbStrength = 4f;
         public const float elevationPerturbStrength = 1.5f;
 
+        // mesh grid chunks
+        public const int chunkSizeX = 5, chunkSizeZ = 5;
+
         // hex cell corner positions
         private static Vector3[] corners = {
         new(0f, 0f, outerRadius),

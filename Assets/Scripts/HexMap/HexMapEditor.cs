@@ -45,7 +45,6 @@ namespace CardGame.HexMap
         {
             cell.colour = m_activeColour;
             cell.Elevation = m_activeElevation;
-            m_hexMap.Refresh();
         }
 
         public void SelectColour(int index)

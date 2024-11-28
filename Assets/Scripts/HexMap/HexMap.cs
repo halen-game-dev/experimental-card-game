@@ -12,11 +12,14 @@ namespace CardGame.HexMap
 {
     public class HexMap : MonoBehaviour
     {
+        [SerializeField] private HexMapChunk m_chunkPrefab;
         [SerializeField] private HexCell m_cellPrefab;
 
         [Header("Map Properties")]
-        [SerializeField] private int m_width;
-        [SerializeField] private int m_height;
+        [SerializeField] private int m_chunkCountX = 4;
+        [SerializeField] private int m_chunkCountZ = 3;
+
+        private int m_cellCountX, m_cellCountZ;
 
         [Space]
 
@@ -28,9 +31,9 @@ namespace CardGame.HexMap
         [Header("Irregularity")]
         public Texture2D noiseSource;
 
+        // objects
+        private HexMapChunk[] m_chunks;
         private HexCell[] m_cells;
-        private Canvas m_mapCanvas;
-        private HexMesh m_hexMesh;
 
         private void OnEnable()
         {
@@ -40,51 +43,54 @@ namespace CardGame.HexMap
         private void Awake()
         {
             HexMetrics.noiseSource = noiseSource;
-            
-            m_mapCanvas = GetComponentInChildren<Canvas>();
-            m_hexMesh = GetComponentInChildren<HexMesh>();
-            
-            m_cells = new HexCell[m_height * m_width];
 
-            for (int h = 0, i = 0; h < m_height; h++)
-            {
-                for (int w = 0; w < m_width; w++)
-                {
-                    CreateCell(w, h, i++);
-                }
-            }
-        }
+            m_cellCountX = m_chunkCountX * HexMetrics.chunkSizeX;
+            m_cellCountZ = m_chunkCountZ * HexMetrics.chunkSizeZ;
 
-        private void Start()
-        {           
-            m_hexMesh.Triangulate(m_cells);
-        }
-
-        public void Refresh()
-        {
-            m_hexMesh.Triangulate(m_cells);
+            CreateChunks();
+            CreateCells();
         }
 
         public HexCell GetCell(Vector3 position)
         {
             position = transform.InverseTransformPoint(position);
             HexCoordinates coordinates = HexCoordinates.FromPosition(position);
-            int index = coordinates.X + coordinates.Z * m_width + coordinates.Z / 2;
+            int index = coordinates.X + coordinates.Z * m_cellCountX + coordinates.Z / 2;
             return m_cells[index];
         }
 
-        /// <summary>
-        /// Create a cell at index (m_x, m_z). i is the index in the array.
-        /// </summary>
-        /// <param name="x"></param>
-        /// <param name="z"></param>
-        /// <param name="i"></param>
+        private void CreateChunks()
+        {
+            m_chunks = new HexMapChunk[m_chunkCountX * m_chunkCountZ];
+
+            for (int z = 0, i = 0; z < m_chunkCountZ; z++)
+            {
+                for (int x = 0; x < m_chunkCountX; x++)
+                {
+                    HexMapChunk chunk = m_chunks[i++] = Instantiate(m_chunkPrefab);
+                    chunk.transform.SetParent(transform);
+                }
+            }
+        }
+
+        private void CreateCells()
+        {
+            m_cells = new HexCell[m_cellCountZ * m_cellCountX];
+
+            for (int h = 0, i = 0; h < m_cellCountZ; h++)
+            {
+                for (int w = 0; w < m_cellCountX; w++)
+                {
+                    CreateCell(w, h, i++);
+                }
+            }
+        }
+
         private void CreateCell(int x, int z, int i)
         {
             Vector3 positon = new((x + z * 0.5f - z / 2) * HexMetrics.innerRadius * 2f, 0, z * HexMetrics.outerRadius * 1.5f);
 
             HexCell cell = m_cells[i] = Instantiate(m_cellPrefab);
-            cell.transform.SetParent(transform, false);
             cell.transform.localPosition = positon;
             cell.coordinates = HexCoordinates.FromOffsetCoordinates(x, z);
             cell.colour = m_defaultColour;
@@ -97,29 +103,41 @@ namespace CardGame.HexMap
             {
                 if ((z & 1) == 0)
                 {
-                    cell.SetNeighbour(HexDirection.SE, m_cells[i - m_width]);
+                    cell.SetNeighbour(HexDirection.SE, m_cells[i - m_cellCountX]);
                     if (x > 0)
                     {
-                        cell.SetNeighbour(HexDirection.SW, m_cells[i - m_width - 1]);
+                        cell.SetNeighbour(HexDirection.SW, m_cells[i - m_cellCountX - 1]);
                     }
                 }
                 else
                 {
-                    cell.SetNeighbour(HexDirection.SW, m_cells[i - m_width]);
-                    if (x < m_width - 1)
+                    cell.SetNeighbour(HexDirection.SW, m_cells[i - m_cellCountX]);
+                    if (x < m_cellCountX - 1)
                     {
-                        cell.SetNeighbour(HexDirection.SE, m_cells[i - m_width + 1]);
+                        cell.SetNeighbour(HexDirection.SE, m_cells[i - m_cellCountX + 1]);
                     }
                 }
             }
 
             var label = Instantiate(m_cellLabelPrefab);
-            label.rectTransform.SetParent(m_mapCanvas.transform, false);
             label.rectTransform.anchoredPosition = new(positon.x, positon.z);
             label.text = cell.coordinates.ToString();
             cell.labelRect = label.rectTransform;
 
             cell.Elevation = 0;
+
+            AddCellToChunk(x, z, cell);
+        }
+
+        private void AddCellToChunk(int x, int z, HexCell cell)
+        {
+            int chunkX = x / HexMetrics.chunkSizeX;
+            int chunkZ = z / HexMetrics.chunkSizeZ;
+            HexMapChunk chunk = m_chunks[chunkX + chunkZ * m_chunkCountX];
+
+            int localX = x - chunkX * HexMetrics.chunkSizeX;
+            int localZ = z - chunkZ * HexMetrics.chunkSizeZ;
+            chunk.AddCell(localX + localZ * HexMetrics.chunkSizeX, cell);
         }
     }
 }
