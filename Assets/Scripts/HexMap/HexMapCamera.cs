@@ -114,7 +114,6 @@ namespace CardGame.HexMap
         public void Rotate(InputAction.CallbackContext context)
         {
             m_rotateInput = context.ReadValue<float>();
-            print(m_rotateInput);
         }
 
         private void AdjustRotation()

@@ -19,7 +19,7 @@ namespace CardGame.HexMap
         private Color m_activeColour;
         private int m_activeElevation;
 
-        private bool m_applyColour;
+        private bool m_applyColour = false;
         private bool m_applyElevation = true;
 
         private void Awake()
