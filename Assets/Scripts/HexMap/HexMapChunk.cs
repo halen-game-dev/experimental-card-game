@@ -23,6 +23,7 @@ namespace CardGame.HexMap
             m_mesh = GetComponentInChildren<HexMesh>();
 
             m_cells = new HexCell[HexMetrics.chunkSizeX * HexMetrics.chunkSizeZ];
+            ShowUI(false);
         }
 
         private void LateUpdate()
@@ -37,6 +38,11 @@ namespace CardGame.HexMap
             cell.chunk = this;
             cell.transform.SetParent(transform, false);
             cell.labelRect.SetParent(m_mapCanvas.transform, false);
+        }
+
+        public void ShowUI(bool value)
+        {
+            m_mapCanvas.gameObject.SetActive(value);
         }
 
         public void Refresh()

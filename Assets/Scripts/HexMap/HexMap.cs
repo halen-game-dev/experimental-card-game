@@ -62,6 +62,19 @@ namespace CardGame.HexMap
             return m_cells[index];
         }
 
+        public HexCell GetCell(HexCoordinates coordinates)
+        {
+            int z = coordinates.Z;
+            if (z < 0 || z >= m_cellCountZ)
+                return null;
+
+            int x = coordinates.X + z / 2;
+            if (x < 0 || x >= m_cellCountX)
+                return null;
+
+            return m_cells[x + z * m_cellCountX];
+        }
+
         private void CreateChunks()
         {
             m_chunks = new HexMapChunk[m_chunkCountX * m_chunkCountZ];
@@ -141,6 +154,14 @@ namespace CardGame.HexMap
             int localX = x - chunkX * HexMetrics.chunkSizeX;
             int localZ = z - chunkZ * HexMetrics.chunkSizeZ;
             chunk.AddCell(localX + localZ * HexMetrics.chunkSizeX, cell);
+        }
+
+        public void ShowUI(bool value)
+        {
+            for (int k = 0; k < m_chunks.Length; k++)
+            {
+                m_chunks[k].ShowUI(value);
+            }
         }
     }
 }

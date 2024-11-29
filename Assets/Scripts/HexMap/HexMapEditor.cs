@@ -18,39 +18,76 @@ namespace CardGame.HexMap
 
         private Color m_activeColour;
         private int m_activeElevation;
+        private int m_brushSize;
 
         private bool m_applyColour = false;
         private bool m_applyElevation = true;
 
-        private void Awake()
+        private bool m_mouseHeld = false;
+
+        private void Update()
         {
-            SelectColour(0);
+            if (m_mouseHeld)
+            {
+                // if mouse is over UI, as EventSystem can only detect UI objects
+                if (EventSystem.current.IsPointerOverGameObject())
+                    return;
+
+                Ray inputRay = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+                if (Physics.Raycast(inputRay, out RaycastHit hit))
+                {
+                    EditCells(m_hexMap.GetCell(hit.point));
+                }
+            }
         }
 
-        public void CastForHexCell(InputAction.CallbackContext context)
+        public void MouseLeftButton(InputAction.CallbackContext context)
         {
-            // if mouse has not just been "clicked"
-            if (!context.started)
-                return;
+            if (context.started)
+                m_mouseHeld = true;
+            else if (context.canceled)
+                m_mouseHeld = false;
+        }
 
-            // if mouse is over UI, as EventSystem can only detect UI objects
-            if (EventSystem.current.IsPointerOverGameObject())
-                return;
+        private void EditCells(HexCell center)
+        {
+            int centerX = center.coordinates.X;
+            int centerZ = center.coordinates.Z;
 
-            Ray inputRay = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
-            if (Physics.Raycast(inputRay, out RaycastHit hit))
+            // bottom half of brush
+            for (int r = 0, z = centerZ - m_brushSize; z <= centerZ; z++, r++)
             {
-                EditCell(m_hexMap.GetCell(hit.point));
+                for (int x = centerX - r; x <= centerX + m_brushSize; x++)
+                {
+                    EditCell(m_hexMap.GetCell(new HexCoordinates(x, z)));
+                }
+            }
+
+            // top half of brush
+            for (int r = 0, z = centerZ + m_brushSize; z > centerZ; z--, r++)
+            {
+                for (int x = centerX - m_brushSize; x <= centerX + r; x++)
+                {
+                    EditCell(m_hexMap.GetCell(new HexCoordinates(x, z)));
+                }
             }
         }
 
         private void EditCell(HexCell cell)
         {
-            if (m_applyColour)
-                cell.Colour = m_activeColour;
+            if (cell)
+            {
+                if (m_applyColour)
+                    cell.Colour = m_activeColour;
 
-            if (m_applyElevation)
-                cell.Elevation = m_activeElevation;
+                if (m_applyElevation)
+                    cell.Elevation = m_activeElevation;
+            }
+        }
+
+        public void ShowUI(bool value)
+        {
+            m_hexMap.ShowUI(value);
         }
 
         public void SelectColour(int index)
@@ -68,6 +105,11 @@ namespace CardGame.HexMap
         public void SetApplyElevation(bool value)
         {
             m_applyElevation = value;
+        }
+
+        public void SetBrushSize(float size)
+        {
+            m_brushSize = (int)size;
         }
     }
 }
