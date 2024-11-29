@@ -13,17 +13,24 @@ namespace CardGame.HexMap
 {
     public class HexMapEditor : MonoBehaviour
     {
+        private enum OptionalToggle { Ignore, Yes, No }
+        
         [SerializeField] private HexMap m_hexMap;
         [SerializeField] private Color[] m_colours;
 
         private Color m_activeColour;
         private int m_activeElevation;
         private int m_brushSize;
+        private OptionalToggle m_riverMode;
 
         private bool m_applyColour = false;
         private bool m_applyElevation = true;
 
         private bool m_mouseHeld = false;
+
+        private bool m_isDrag = false;
+        private HexDirection m_dragDirection;
+        private HexCell m_previousDragCell;
 
         private void Update()
         {
@@ -36,7 +43,16 @@ namespace CardGame.HexMap
                 Ray inputRay = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
                 if (Physics.Raycast(inputRay, out RaycastHit hit))
                 {
-                    EditCells(m_hexMap.GetCell(hit.point));
+                    HexCell currentCell = m_hexMap.GetCell(hit.point);
+
+                    // check if drag is valid
+                    if (m_previousDragCell && m_previousDragCell != currentCell)
+                        ValidateDrag(currentCell);
+                    else
+                        m_isDrag = false;
+
+                    EditCells(currentCell);
+                    m_previousDragCell = currentCell;
                 }
             }
         }
@@ -46,7 +62,10 @@ namespace CardGame.HexMap
             if (context.started)
                 m_mouseHeld = true;
             else if (context.canceled)
+            {
                 m_mouseHeld = false;
+                //m_previousDragCell = null;
+            }
         }
 
         private void EditCells(HexCell center)
@@ -82,7 +101,29 @@ namespace CardGame.HexMap
 
                 if (m_applyElevation)
                     cell.Elevation = m_activeElevation;
+
+                if (m_riverMode == OptionalToggle.No)
+                    cell.RemoveRiver();
+                else if (m_isDrag && m_riverMode == OptionalToggle.Yes)
+                {
+                    HexCell otherCell = cell.GetNeighbour(m_dragDirection.Opposite());
+                    if (otherCell)
+                        otherCell.SetOutgoingRiver(m_dragDirection);
+                }
             }
+        }
+
+        private void ValidateDrag(HexCell currentCell)
+        {
+            for (m_dragDirection = HexDirection.NE; m_dragDirection <= HexDirection.NW; m_dragDirection++)
+            {
+                if (m_previousDragCell.GetNeighbour(m_dragDirection) == currentCell)
+                {
+                    m_isDrag = true;
+                    return;
+                }
+            }
+            m_isDrag = false;
         }
 
         public void ShowUI(bool value)
@@ -110,6 +151,11 @@ namespace CardGame.HexMap
         public void SetBrushSize(float size)
         {
             m_brushSize = (int)size;
+        }
+
+        public void SetRiverMode(int mode)
+        {
+            m_riverMode = (OptionalToggle)mode;
         }
     }
 }

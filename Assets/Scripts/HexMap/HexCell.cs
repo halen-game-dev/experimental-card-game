@@ -11,6 +11,8 @@ namespace CardGame.HexMap
 {
     public class HexCell : MonoBehaviour
     {
+        [SerializeField] private HexCell[] m_neighbours;
+
         public HexCoordinates coordinates;
         private Color m_colour;
         private int m_elevation = int.MinValue;
@@ -39,7 +41,7 @@ namespace CardGame.HexMap
             {
                 if (m_elevation == value)
                     return;
-                
+
                 m_elevation = value;
                 Vector3 position = transform.localPosition;
                 position.y = value * HexMetrics.elevationStep;
@@ -50,17 +52,35 @@ namespace CardGame.HexMap
                 labelPosition.z = -position.y;
                 labelRect.localPosition = labelPosition;
 
+                // remove any rivers that now flow uphill
+                if (m_hasOutgoingRiver && m_elevation < GetNeighbour(m_outgoingRiver).m_elevation)
+                    RemoveOutgoingRiver();
+                if (m_hasIncomingRiver && m_elevation > GetNeighbour(m_incomingRiver).m_elevation)
+                    RemoveIncomingRiver();
+
                 Refresh();
             }
         }
 
-        [SerializeField] private HexCell[] m_neighbours;
+        // rivers
+        private bool m_hasIncomingRiver;
+        private bool m_hasOutgoingRiver;
+        private HexDirection m_incomingRiver, m_outgoingRiver;
+
+        public bool HasRiver => m_hasIncomingRiver || m_hasOutgoingRiver;
+        public bool HasRiverBeginOrEnd => m_hasIncomingRiver != m_hasOutgoingRiver;
+        public bool HasIncomingRiver => m_hasIncomingRiver;
+        public bool HasOutgoingRiver => m_hasOutgoingRiver;
+        public HexDirection IncomingRiver => m_incomingRiver;
+        public HexDirection OutgoingRiver => m_outgoingRiver;
+
 
         private void Awake()
         {
             m_neighbours = new HexCell[6];
         }
 
+        #region Initialisation
         public HexCell GetNeighbour(HexDirection direction)
         {
             return m_neighbours[(int)direction];
@@ -81,6 +101,74 @@ namespace CardGame.HexMap
         {
             return HexMetrics.GetEdgeType(m_elevation, otherCell.m_elevation);
         }
+        #endregion
+
+        #region Rivers
+        public bool HasRiverThroughEdge(HexDirection direction)
+        {
+            return m_hasIncomingRiver && m_incomingRiver == direction ||
+                m_hasOutgoingRiver && m_outgoingRiver == direction;
+        }
+
+        public void SetOutgoingRiver(HexDirection direction)
+        {
+            // if river already exists
+            if (m_hasOutgoingRiver && m_outgoingRiver == direction)
+                return;
+
+            // stop river from flowing uphill
+            HexCell neighbour = GetNeighbour(direction);
+            if (!neighbour || m_elevation < neighbour.m_elevation)
+                return;
+
+            // remove old outgoing river and remove incoming river if it will overlap
+            RemoveOutgoingRiver();
+            if (m_hasIncomingRiver && m_incomingRiver == direction)
+                RemoveIncomingRiver();
+
+            // set the new outgoing river
+            m_hasOutgoingRiver = true;
+            m_outgoingRiver = direction;
+            RefreshSelfOnly();
+
+            // update cell river is connected to
+            neighbour.RemoveIncomingRiver();
+            neighbour.m_hasIncomingRiver = true;
+            neighbour.m_incomingRiver = direction.Opposite();
+            neighbour.RefreshSelfOnly();
+        }
+
+        public void RemoveRiver()
+        {
+            RemoveOutgoingRiver();
+            RemoveOutgoingRiver();
+        }
+
+        public void RemoveOutgoingRiver()
+        {
+            if (!m_hasOutgoingRiver)
+                return;
+            m_hasOutgoingRiver = false;
+            RefreshSelfOnly();
+
+            HexCell neighbour = GetNeighbour(m_outgoingRiver);
+            neighbour.m_hasIncomingRiver = false;
+            neighbour.RefreshSelfOnly();
+        }
+
+        public void RemoveIncomingRiver()
+        {
+            if (!m_hasIncomingRiver)
+                return;
+
+            m_hasIncomingRiver = false;
+            RefreshSelfOnly();
+
+            HexCell neighbour = GetNeighbour(m_incomingRiver);
+            neighbour.m_hasOutgoingRiver = false;
+            neighbour.RefreshSelfOnly();
+        }
+        #endregion
 
         private void Refresh()
         {
@@ -96,6 +184,11 @@ namespace CardGame.HexMap
                     }
                 }
             }
+        }
+
+        private void RefreshSelfOnly()
+        {
+            chunk.Refresh();
         }
     }
 }
