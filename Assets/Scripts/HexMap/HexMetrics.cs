@@ -35,6 +35,9 @@ namespace CardGame.HexMap
         // mesh grid chunks
         public const int chunkSizeX = 5, chunkSizeZ = 5;
 
+        // rivers
+        public const float streamBedElevationOffset = -1f;
+
         // hex cell corner positions
         private static Vector3[] corners = {
         new(0f, 0f, outerRadius),

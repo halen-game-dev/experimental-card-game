@@ -61,6 +61,7 @@ namespace CardGame.HexMap
                 Refresh();
             }
         }
+        public float StreamBedY => (m_elevation + HexMetrics.streamBedElevationOffset) * HexMetrics.elevationStep;
 
         // rivers
         private bool m_hasIncomingRiver;

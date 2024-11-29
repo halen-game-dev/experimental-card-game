@@ -64,6 +64,11 @@ namespace CardGame.HexMap
                 center + HexMetrics.GetSecondSolidCorner(direction)
             );
 
+            if (cell.HasRiverThroughEdge(direction))
+            {
+                e.v3.y = cell.StreamBedY;
+            }
+
             TriangulateEdgeFan(center, e, cell.Colour);
 
             if (direction <= HexDirection.SE)
@@ -81,8 +86,13 @@ namespace CardGame.HexMap
             bridge.y = neighbour.Position.y - cell.Position.y;
             EdgeVertices e2 = new EdgeVertices(
                 e1.v1 + bridge,
-                e1.v4 + bridge
+                e1.v5 + bridge
             );
+
+            if (cell.HasRiverThroughEdge(direction))
+            {
+                e2.v3.y = neighbour.StreamBedY;
+            }
 
             if (cell.GetEdgeType(direction) == HexEdgeType.Slope)
             {
@@ -96,7 +106,7 @@ namespace CardGame.HexMap
             HexCell nextNeighbour = cell.GetNeighbour(direction.Next());
             if (direction <= HexDirection.E && nextNeighbour != null)
             {
-                Vector3 v5 = e1.v4 + HexMetrics.GetBridge(direction.Next());
+                Vector3 v5 = e1.v5 + HexMetrics.GetBridge(direction.Next());
                 v5.y = nextNeighbour.Position.y;
 
                 // rotate triangle correctly based on 3 surrounding cell's elevation
@@ -104,20 +114,20 @@ namespace CardGame.HexMap
                 {
                     if (cell.Elevation <= nextNeighbour.Elevation)
                     {
-                        TriangulateCorner(e1.v4, cell, e2.v4, neighbour, v5, nextNeighbour);
+                        TriangulateCorner(e1.v5, cell, e2.v5, neighbour, v5, nextNeighbour);
                     }
                     else
                     {
-                        TriangulateCorner(v5, nextNeighbour, e1.v4, cell, e2.v4, neighbour);
+                        TriangulateCorner(v5, nextNeighbour, e1.v5, cell, e2.v5, neighbour);
                     }
                 }
                 else if (neighbour.Elevation <= nextNeighbour.Elevation)
                 {
-                    TriangulateCorner(e2.v4, neighbour, v5, nextNeighbour, e1.v4, cell);
+                    TriangulateCorner(e2.v5, neighbour, v5, nextNeighbour, e1.v5, cell);
                 }
                 else
                 {
-                    TriangulateCorner(v5, nextNeighbour, e1.v4, cell, e2.v4, neighbour);
+                    TriangulateCorner(v5, nextNeighbour, e1.v5, cell, e2.v5, neighbour);
                 }
             }
         }
@@ -308,6 +318,8 @@ namespace CardGame.HexMap
             AddTriangleColour(colour);
             AddTriangle(center, edge.v3, edge.v4);
             AddTriangleColour(colour);
+            AddTriangle(center, edge.v4, edge.v5);
+            AddTriangleColour(colour);
         }
 
         private void TriangulateEdgeStrip(EdgeVertices e1, Color c1, EdgeVertices e2, Color c2)
@@ -317,6 +329,8 @@ namespace CardGame.HexMap
             AddQuad(e1.v2, e1.v3, e2.v2, e2.v3);
             AddQuadColour(c1, c2);
             AddQuad(e1.v3, e1.v4, e2.v3, e2.v4);
+            AddQuadColour(c1, c2);
+            AddQuad(e1.v4, e1.v5, e2.v4, e2.v5);
             AddQuadColour(c1, c2);
         }
         # endregion
